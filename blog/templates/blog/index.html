@@ -16,6 +16,7 @@
                     <p>
                         {{ article.content }}
                     </p>
+                    <a class="pure-button" href="{% url "blog:article_page" article_id=article.id %}">Read More >>> </a>
                 </div>
         </section>
     {% endfor %}
