@@ -1,5 +1,5 @@
 {% extends "blog/base.html" %}
-
+{% load custom_markdown %}
 {% block content %}
 <div class="posts">
     {% for article in articles%}
@@ -14,11 +14,25 @@
 
                 <div class="post-description">
                     <p>
-                        {{ article.content }}
+                        {{ article.content|custom_markdown|truncatechars_html:100 }}
                     </p>
                     <a class="pure-button" href="{% url "blog:article_page" article_id=article.id %}">Read More >>> </a>
                 </div>
         </section>
     {% endfor %}
+
+    {% if articles.object_list and articles.paginator.num_pages > 1 %}
+      <div>
+      <ul class="pager">
+      {% if articles.has_previous %}
+        <li><a href="?page={{ articles.previous_page_number }}">上一页</a></li>
+      {% endif %}
+
+      {% if articles.has_next %}
+        <li><a href="?page={{ articles.next_page_number }}">下一页</a></li>
+      {% endif %}
+      </ul>
+      </div>
+    {% endif %}
 </div><!-- /.blog-post -->
 {% endblock %}

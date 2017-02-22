@@ -1,0 +1,25 @@
+{% extends "blog/base.html" %}
+
+{% load custom_markdown %}
+{% block content %}
+<div class="posts">
+    {% for article in articles %}
+        <section class="post">
+            <header class="post-header">
+                <h2 class="post-title"><a href="{% url "blog:article_page" article_id=article.id %}">{{ article.title }}</a></h2>
+
+                    <p class="post-meta">
+                        Time:  <a class="post-author" href="#">{{ article.pub_time|date:"Y M d"}}</a> <a class="post-category post-category-js" href="{% url "blog:search_tag" tag_name=article.category %}">{{ article.category|title }}</a>
+                    </p>
+            </header>
+
+            <div class="post-description">
+                <p>
+                    {{ article.content|custom_markdown }}
+                </p>
+            </div>
+            <a class="pure-button" href="{% url "blog:article_page" article_id=article.id %}">Read More >>> </a>
+        </section>
+    {% endfor %}
+</div><!-- /.blog-post -->
+{% endblock %}

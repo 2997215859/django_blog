@@ -1,5 +1,5 @@
 {% extends "blog/base.html" %}
-
+{% load custom_markdown %}
 {% block content %}
 <div class="posts">
     <section class="post">
@@ -10,12 +10,12 @@
                     Time:  <a class="post-author" href="#">{{ article.pub_time|date:"Y /m /d"}}</a> <a class="post-category post-category-js" href="#">{{ article.category }}</a>
                 </p>
         </header>
-
-            <div class="post-description">
-                <p>
-                    {{ article.content }}
-                </p>
-            </div>
-        </section>
+        <div class="post-description">
+            <p>
+                {{ article.content | custom_markdown}}
+            </p>
+        </div>
+    </section>
+    {% include "blog/duoshuo.html" %}
 </div><!-- /.blog-post -->
 {% endblock %}
