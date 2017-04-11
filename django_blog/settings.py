@@ -1,3 +1,4 @@
+# -*- encoding=utf-8 -*-
 """
 Django settings for django_blog project.
 
@@ -118,4 +119,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
+# 用于配置单独app下的静态文件
 STATIC_URL = '/static/'
+
+# 用于配置整个project下的静态文件
+STATICFILES_DIRS = (
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+    os.path.join(BASE_DIR, 'static').replace('\\','/'), # 首选project静态文件搜寻路径
+)
+
+

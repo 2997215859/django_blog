@@ -1,38 +1,81 @@
 {% extends "blog/base.html" %}
 {% load custom_markdown %}
 {% block content %}
-<div class="posts">
-    {% for article in articles%}
-        <section class="post">
-            <header class="post-header">
-                <h2 class="post-title">{{ article.title }}</h2>
+    <div id="posts">
+        	<div class="each-post">
+		<div class="title">
+			<a href="http://blog.leanote.com/post/2997215859/8060701fdacd" title="全文">
+				django 静态文件
+			</a>
+		</div>
+		<div class="created-time">
 
-                    <p class="post-meta">
-                        Time:  <a class="post-author" href="#">{{ article.date_time }}</a> <a class="post-category post-category-js" href="#">{{ article.category }}</a>
-                    </p>
-            </header>
+			    <i class="fa fa-bookmark-o"></i>
+				<a class="label label-default label-post" href="http://blog.leanote.com/tag/2997215859/python">python</a> <a class="label label-default label-post" href="http://blog.leanote.com/tag/2997215859/django">django</a>
+				&nbsp;&nbsp;
 
-                <div class="post-description">
-                    <p>
-                        {{ article.content|custom_markdown|truncatechars_html:100 }}
-                    </p>
-                    <a class="pure-button" href="{% url "blog:article_page" article_id=article.id %}">Read More >>> </a>
-                </div>
-        </section>
-    {% endfor %}
 
-    {% if articles.object_list and articles.paginator.num_pages > 1 %}
-      <div>
-      <ul class="pager">
-      {% if articles.has_previous %}
-        <li><a href="?page={{ articles.previous_page_number }}">上一页</a></li>
-      {% endif %}
+			<i class="fa fa-clock-o"></i> 2017-04-11 23:00:31
+			&nbsp;&nbsp;
+			<span class="fa fa-eye"></span> 1
+			&nbsp;&nbsp;
+			<span class="fa fa-thumbs-o-up"></span> 0
+			&nbsp;&nbsp;
+			<span class="fa fa-comments-o"></span> 0
+		</div>
+		<div class="desc">
+			<div>
+						                        <div id="wmd-preview" class="preview-content"></div>
+						                    <div id="wmd-preview-section-117" class="wmd-preview-section preview-content"><div class="se-section-delimiter"></div>
 
-      {% if articles.has_next %}
-        <li><a href="?page={{ articles.next_page_number }}">下一页</a></li>
-      {% endif %}
-      </ul>
-      </div>
-    {% endif %}
-</div><!-- /.blog-post -->
+<p>转自: <br>
+1. <a href="http://python.usyiyi.cn/django/howto/static-files/index.html">http://python.usyiyi.cn/django/howto/static-files/index.html</a> <br>
+2. <a href="http://www.cnblogs.com/MnCu8261/p/6013557.html">http://www.cnblogs.com/MnCu8261/p/6013557.html</a></p>
+
+<p>最近准备用django写一个博客，界面直接用的leanote的界面，第一次接触到django中的静态文件管理，再次mark一篇博文，一篇文档</p>
+
+</div><div id="wmd-preview-section-138" class="wmd-preview-section preview-content"><div class="se-section-delimiter"></div>
+
+<h1 id="django中的静态文件管理">django中的静态文件管理</h1>
+
+<p>一个站点通常需要保存额外的文件，比如图片、css样式文件、js脚本文件，在django中，倾向于将这些文件称为静态文件。django提供了django.contrib.staticfiles 模块来帮助我们方便的管理静态文件。</p></div><div id="wmd-preview-section-225" class="wmd-preview-section preview-content"><div class="se-section-delimiter"></div>
+
+<h2 id="配置静态文件的两种方式">配置静态文件的两种方式</h2>
+
+<ol>
+<li>配置单独app下的静态文件，比如某个app下的单独文件</li>
+<li>配置整个project下的静态文件，适用于那些和单独app关联不大的文件，比如jquery、bootstrap等等</li>
+</ol></div><div id="wmd-preview-section-857" class="wmd-preview-section preview-content"><div class="se-section-delimiter"></div>
+
+<h2 id="配置步骤">配置步骤</h2>
+
+<ol>
+<li>首先，我们需要确认在settings.py文件中的INSTALLED_APPS变量中存在 django.contrib.staticfiles</li>
+</ol></div><div id="wmd-preview-section-900" class="wmd-preview-section preview-content"><div class="se-section-delimiter"></div>
+
+<pre class="prettyprint linenums prettyprinted"><ol class="linenums"><li class="L0 prettyprint linenums"><code><span class="pln">  INSTALLED_APPS </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span></code></li><li class="L1 prettyprint linenums"><code><span class="pln">    </span><span class="str">'django.contrib.admin'</span><span class="pun">,</span></code></li><li class="L2 prettyprint linenums"><code><span class="pln">    </span><span class="str">'django.contrib.auth'</span><span class="pun">,</span></code></li><li class="L3 prettyprint linenums"><code><span class="pln">    </span><span class="str">'django.contrib.contenttypes'</span><span class="pun">,</span></code></li><li class="L4 prettyprint linenums"><code><span class="pln">    </span><span class="str">'django.contrib.sessions'</span><span class="pun">,</span></code></li><li class="L5 prettyprint linenums"><code><span class="pln">    </span><span class="str">'django.contrib.messages'</span><span class="pun">,</span></code></li><li class="L6 prettyprint linenums"><code><span class="pln">    </span><span class="str">'django.contrib.staticfiles'</span><span class="pun">,</span><span class="pln"> </span></code></li><li class="L7 prettyprint linenums"><code><span class="pun">)</span></code></li></ol></pre>
+
+<p>2.如果我们要配置单独app下的静态文件的话，执行此步骤。</p>
+
+<ul>
+<li>在settings.py文件中定义 STATIC_URL 变量。</li>
+</ul></div><div id="wmd-preview-section-1265" class="wmd-preview-section preview-content"><div class="se-section-delimiter"></div>
+
+<pre class="prettyprint linenums prettyprinted"><ol class="linenums"><li class="L0 prettyprint linenums"><code class="language-python"><span class="pln">STATIC_URL </span><span class="pun">=</span><span class="pln"> </span><span class="str">'/static/'</span></code></li></ol></pre>
+
+<ul>
+<li>如果我们要配置单独app下的静态文件的话，这时，我们需要在app中建立一个名为static的文件夹。</li>
+</ul>
+
+<p>3.如果我们要配置整个project下的静态文件的话，执行此步骤。</p>
+
+<ul>
+<li>如果我们要配置整个project下的静态文件的话，我们需要在整个project 中建立一个</li></ul></div></div>
+		</div>
+		<div id="moreContainer">
+		    <a class="more" href="http://blog.leanote.com/post/2997215859/8060701fdacd" title="全文">查看</a>
+        </div>
+	</div>
+
+    </div>
 {% endblock %}

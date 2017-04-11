@@ -6,67 +6,147 @@
 <meta name="description" content="A layout example that shows off a blog page with a list of posts.">
 
     <title>Ruiy 's Blog</title>
-    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
-    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css">
-    <link rel="stylesheet" href="http://picturebag.qiniudn.com/blog.css">
-    <link rel="stylesheet" href="http://picturebag.qiniudn.com/monokai.css">
+{#    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">#}
+{#    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css">#}
+{#    <link rel="stylesheet" href="http://picturebag.qiniudn.com/blog.css">#}
+{#    <link rel="stylesheet" href="http://picturebag.qiniudn.com/monokai.css">#}
+{#    <link href="https://cdn.bootcss.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" rel="stylesheet">#}
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static "css/bootstrap.css" %}">
+    <link rel="stylesheet" href="{% static "blog/css/style.css" %}">
 </head>
-<body>
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-        <div class="header">
-            <h1 class="brand-title">Ruiy 's blog</h1>
-            <h2 class="brand-tagline">write the less, do the more</h2>
-            <nav class="nav">
-                <ul class="nav-list">
-                    <li class="nav-item">
-                        <a class="button-success pure-button" href="{% url "blog:index" %}">主页</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="button-success pure-button" href="{% url "blog:archive" %}">归档</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="pure-button" href="https://github.com/2997215859">Github</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="button-error pure-button" href="">Weibo</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="button-success pure-button" href="{% url "blog:index" %}">专题</a>
-                    </li>
-                    <li>
-                    <form class="pure-form" action="{% url "blog:search" %}" method="post">
-                        {% csrf_token %}
-                        <input class="pure-input-3-3" type="text" name="search_str" placeholder="search">
-                    </form>
-                    </li>
-                    <li class="nav-item">
-                        <a class="button-success pure-button" href="{% url "blog:about_me" %}">About Me</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="button-success pure-button" href="{% url "blog:RSS" %}">RSS</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </div>
+<body style="zoom: 1">
+<div id="headerAndNav" >
+	<div id="headerContainer" class="container">
 
-    <div class="content pure-u-1 pure-u-md-3-4">
-        <div>
-            {% block content %}
-            {% endblock %}
-            <div class="footer">
-                <div class="pure-menu pure-menu-horizontal pure-menu-open">
-                    <ul>
-                        <li><a href="http://andrewliu.tk/about/">About Me</a></li>
-                        <li><a href="http://twitter.com/yuilibrary/">Twitter</a></li>
-                        <li><a href="http://github.com/yahoo/pure/">GitHub</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+		<div id="header">
+
+
+			<h1>
+				<a href="http://blog.leanote.com/2997215859" id="logo">
+
+    				<div class="blog-logo">
+    				    <img src="http://leanote.com/public/upload/712/57cccf2aab644133ed0714c2/images/logo/a8797f65fa1ffd93d83dfefee572b898.jpg" title="但愿常醉不愿醒 的 博客"/>
+    				</div>
+
+    				<div>
+    				    但愿常醉不愿醒 的 博客
+    				</div>
+				</a>
+			</h1>
+			<div id="blogDesc">
+				Love Leanote!
+			</div>
+		</div>
+	</div>
+
+
+	<div class="navbar navbar-default">
+	  <div class="container">
+	    <div class="navbar-header">
+	      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	      <a class="navbar-brand" href="http://blog.leanote.com/2997215859">
+
+			    <img src="http://leanote.com/public/upload/712/57cccf2aab644133ed0714c2/images/logo/a8797f65fa1ffd93d83dfefee572b898.jpg" title="但愿常醉不愿醒 的 博客"/>
+
+			但愿常醉不愿醒 的 博客
+
+	      </a>
+	    </div>
+	    <div class="navbar-collapse collapse">
+	      <ul class="nav navbar-nav">
+
+	    	<li class="active"><a href="http://blog.leanote.com/2997215859">主页</a></li>
+			    <li class="">
+					<a href="http://blog.leanote.com/single/2997215859/About-Me">About Me</a>
+				</li>
+
+
+
+			<li class="">
+				<a href="http://blog.leanote.com/archives/2997215859">归档</a>
+			</li>
+			<li class="">
+				<a href="http://blog.leanote.com/tags/2997215859">标签</a>
+			</li>
+
+	      </ul>
+	      <form class="navbar-form navbar-right" id="search" onsubmit="search(event);return false;">
+	      	<div class="input-group">
+			  	<span class="input-group-addon" id="searchIcon" onclick="search(event);"><i class="fa fa-search"></i></span>
+		        <input type="text" placeholder="search" id="searchInput" class="form-control" value="">
+		  	</div>
+	      </form>
+	    </div>
+	  </div>
+	</div>
 </div>
+
+<div id="postsContainer">
+    {% block content %}
+    {% endblock %}
+</div>
+
+{#<div id="layout" class="pure-g">#}
+{#    <div class="sidebar pure-u-1 pure-u-md-1-4">#}
+{#        <div class="header">#}
+{#            <h1 class="brand-title">Ruiy 's blog</h1>#}
+{#            <h2 class="brand-tagline">write the less, do the more</h2>#}
+{#            <nav class="nav">#}
+{#                <ul class="nav-list">#}
+{#                    <li class="nav-item">#}
+{#                        <a class="button-success pure-button" href="{% url "blog:index" %}">主页</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a class="button-success pure-button" href="{% url "blog:archive" %}">归档</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a class="pure-button" href="https://github.com/2997215859">Github</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a class="button-error pure-button" href="">Weibo</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a class="button-success pure-button" href="{% url "blog:index" %}">专题</a>#}
+{#                    </li>#}
+{#                    <li>#}
+{#                    <form class="pure-form" action="{% url "blog:search" %}" method="post">#}
+{#                        {% csrf_token %}#}
+{#                        <input class="pure-input-3-3" type="text" name="search_str" placeholder="search">#}
+{#                    </form>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a class="button-success pure-button" href="{% url "blog:about_me" %}">About Me</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a class="button-success pure-button" href="{% url "blog:RSS" %}">RSS</a>#}
+{#                    </li>#}
+{#                </ul>#}
+{#            </nav>#}
+{#        </div>#}
+{#    </div>#}
+{##}
+{#    <div class="content pure-u-1 pure-u-md-3-4">#}
+{#        <div>#}
+{#            {% block content %}#}
+{#            {% endblock %}#}
+{#            <div class="footer">#}
+{#                <div class="pure-menu pure-menu-horizontal pure-menu-open">#}
+{#                    <ul>#}
+{#                        <li><a href="http://andrewliu.tk/about/">About Me</a></li>#}
+{#                        <li><a href="http://twitter.com/yuilibrary/">Twitter</a></li>#}
+{#                        <li><a href="http://github.com/yahoo/pure/">GitHub</a></li>#}
+{#                    </ul>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
 
 </body>
 </html>
