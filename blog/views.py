@@ -24,7 +24,7 @@ class RSSFeed(Feed) :
 # Create your views here.
 def index(request):
     articles = Article.objects.all()
-    paginator = Paginator(articles, 2)
+    paginator = Paginator(articles, 200)
     page = request.GET.get('page')
     try:
         current_articles = paginator.page(page)

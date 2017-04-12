@@ -1,0 +1,21 @@
+diff a/blog/templates/blog/index.html b/blog/templates/blog/index.html	(rejected hunks)
+@@ -1,19 +1,6 @@
+ {% extends "blog/base.html" %}
+ {% load custom_markdown %}
+ {% block content %}
+-    {% if articles.object_list and articles.paginator.num_pages > 1 %}
+-      <div>
+-      <ul class="pager">
+-      {% if articles.has_previous %}
+-        <li><a href="?page={{ articles.previous_page_number }}">上一页</a></li>
+-      {% endif %}
+-
+-      {% if articles.has_next %}
+-        <li><a href="?page={{ articles.next_page_number }}">下一页</a></li>
+-      {% endif %}
+-      </ul>
+-      </div>
+-    {% endif %}
+     <div id="posts">
+         	<div class="each-post">
+ 		<div class="title">
