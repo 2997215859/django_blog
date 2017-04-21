@@ -16,7 +16,27 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
+from django.contrib.auth.models import User
+from rest_framework import routers, serializers, viewsets
+from rest_framework.routers import DefaultRouter
+from rest_framework.schemas import get_schema_view
+
+from api_note.views import NotebookViewSet, NoteViewSet, TagViewSet
+from user_group.views import UserViewSet, GroupViewSet
+
+api_router = DefaultRouter()
+api_router.register(r'tag', TagViewSet)
+api_router.register(r'notebook', NotebookViewSet)
+api_router.register(r'user', UserViewSet)
+api_router.register(r'group', GroupViewSet)
+api_router.register(r'note', NoteViewSet)
+
+schema_view = get_schema_view(title='Pastebin API')
 urlpatterns = [
+    url(r'^api/', include(api_router.urls)),
+    url(r'^note/', include('note.urls', namespace='note')),
+    url(r'^schema/$', schema_view),
+    url(r'blog/', include('blog.urls', namespace = 'blog')),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', admin.site.urls),
-    url(r'blog/', include('blog.urls', namespace = 'blog'),)
 ]

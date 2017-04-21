@@ -38,7 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'blog'
+    'rest_framework',
+    'blog',
+    'note',
+    'api_note',
 ]
 
 MIDDLEWARE = [
@@ -130,4 +133,11 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static').replace('\\','/'), # 首选project静态文件搜寻路径
 )
 
-
+# configuration for REST_FRAMEWORK
+REST_FRAMEWORK = {
+    # Use Django's standard 'django.contrib.auth' permissions,
+    # or allow read-only access for unauthenticated users
+    'DEFAULT_PREMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}

@@ -32,6 +32,9 @@ def index(request):
         current_articles = paginator.page(1)
     except EmptyPage:
         current_articles = paginator.page(paginator.num_pages)
+
+    for current_article in current_articles:
+        current_article.tags = current_article.category.split(",")
     return render(request, 'blog/index.html', {'articles': current_articles})
 
 def article_page(request, article_id):

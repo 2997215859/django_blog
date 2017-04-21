@@ -9,5 +9,5 @@ urlpatterns = [
     url(r'^tag/(?P<tag_name>\w+)$', views.search_tag, name = "search_tag"),
     url(r'^aboutme/$', views.about_me, name = "about_me"),
     url(r'^search/$', views.search_str, name = "search"),
-    url(r'^feed/$', views.RSSFeed(), name = "RSS")
+    url(r'^feed/$', views.RSSFeed(), name = "RSS"),
 ]

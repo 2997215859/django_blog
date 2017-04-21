@@ -11,9 +11,11 @@
         </div>
         <div class="created-time">
             <i class="fa fa-bookmark-o"></i>
-            <a class="label label-default label-post" href="http://blog.leanote.com/tag/2997215859/python">python</a>
-            <a class="label label-default label-post" href="http://blog.leanote.com/tag/2997215859/django">django</a>
-            &nbsp;&nbsp;
+{#            <a class="label label-default label-post" href="http://blog.leanote.com/tag/2997215859/python">python</a>#}
+{#            <a class="label label-default label-post" href="http://blog.leanote.com/tag/2997215859/django">django</a>#}
+            {% for tag in article.tags %}
+            <a class="label label-default label-post" href="http://blog.leanote.com/tag/2997215859/django">{{ tag }}</a>&nbsp;
+            {% endfor %}
             <i class="fa fa-clock-o"></i> {{ article.pub_time | date:"Y-m-d H:i:s" }}
             &nbsp;&nbsp;
             <span class="fa fa-eye"></span> 1 &nbsp;&nbsp;
