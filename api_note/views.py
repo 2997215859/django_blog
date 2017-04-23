@@ -14,9 +14,6 @@ class NotebookViewSet(viewsets.ModelViewSet):
     serializer_class = NotebookSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-
 class NoteViewSet(viewsets.ModelViewSet):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer

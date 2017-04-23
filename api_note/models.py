@@ -3,18 +3,17 @@ from __future__ import unicode_literals
 from django.db import models
 
 class Notebook(models.Model):
-    Owner = models.ForeignKey('auth.User', related_name='NotebookOwner', default=2)
     NotebookId = models.CharField(max_length=50)
     UserId = models.CharField(max_length=50)
     ParentNotebookId = models.CharField(max_length=50)
     Seq = models.IntegerField()
     Title = models.CharField(max_length=20)
     UrlTitle = models.CharField(max_length=20)
-    NumberNote = models.IntegerField()
+    NumberNotes = models.IntegerField(default=0)
     IsTrash = models.BooleanField()
     IsBlog = models.BooleanField()
     CreatedTime = models.DateTimeField(auto_now_add=True)
-    UpdateTime = models.DateTimeField(auto_now_add=True)
+    UpdatedTime = models.DateTimeField(auto_now_add=True)
     IsWX = models.BooleanField()
     Usn = models.IntegerField()
     IsDeleted = models.BooleanField()
@@ -49,6 +48,8 @@ class Note(models.Model):
     Usn = models.IntegerField(default=11879)
     IsDeleted = models.BooleanField(default=False)
     IsPublicShare = models.BooleanField(default=False)
+    Content = models.TextField(default="")
+    Abstract = models.TextField(default="")
 
 class Tag(models.Model):
     TagId = models.CharField(max_length=50)
