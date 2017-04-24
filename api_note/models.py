@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 
 class Notebook(models.Model):
-    NotebookId = models.CharField(max_length=50)
+    NotebookId = models.CharField(max_length=50, primary_key=True)
     UserId = models.CharField(max_length=50)
     ParentNotebookId = models.CharField(max_length=50)
     Seq = models.IntegerField()
@@ -20,7 +20,7 @@ class Notebook(models.Model):
     Subs = models.CharField(max_length=50)
 
 class Note(models.Model):
-    NoteId = models.CharField(max_length=50)
+    NoteId = models.CharField(max_length=50, primary_key=True)
     UserId = models.CharField(max_length=50)
     CreatedUserId = models.CharField(max_length=50, default="")
     NotebookId = models.CharField(max_length=50)
@@ -52,7 +52,7 @@ class Note(models.Model):
     Abstract = models.TextField(default="")
 
 class Tag(models.Model):
-    TagId = models.CharField(max_length=50)
+    TagId = models.CharField(max_length=50, primary_key=True)
     UserId = models.CharField(max_length=50)
     Tag = models.CharField(max_length=20)
     Usn = models.IntegerField()

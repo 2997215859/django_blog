@@ -3365,12 +3365,9 @@
 		},
 		data = {
 			addNodeCache: function(setting, node) {
-				console.log("aaaaa")
 				data.getCache(setting).nodes[data.getNodeCacheId(node.tId)] = node
-				console.log("bbbbb")
 			},
 			getNodeCacheId: function(tId) {
-				console.log("ccccc")
 				return tId.substring(tId.lastIndexOf("_") + 1)
 			},
 			addAfterA: function(afterA) {
