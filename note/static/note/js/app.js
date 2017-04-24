@@ -72,6 +72,7 @@ function ajaxGet(t, e, n, o, r) {
 	return _ajax("GET", t, e, n, o, r)
 }
 function ajaxPost(t, e, n, o, r) {
+    console.log("可怕")
 	_ajax("POST", t, e, n, o, r)
 }
 function ajaxPostJson(t, e, n, o, r) {
@@ -805,10 +806,12 @@ Note.curNoteId = "", Note.interval = "", Note.itemIsBlog = '<div class="item-blo
 			c ? (Note.hideReadOnly(), Note.renderNote(s)) : Note.renderNoteReadOnly(s), switchEditor(s.IsMarkdown), LEA.trigger("noteChanged", s), Attach.renderNoteAttachNum(t, !0), Note.contentAjaxSeq++;
 			var l = Note.contentAjaxSeq;
 			if (s.Content) return void n(s, l);
-			var d = "/note/getNoteContent",
-				N = {
-					noteId: t
-				};
+			// var d = "note/getNoteContent",
+			// N = {
+			// 		noteId: t
+			// 	};
+			var d = "/api/note/" + t + "/"
+			N = {}
 			e && (d = "/share/getShareNoteContent", N.sharedUserId = s.UserId), i.showContentLoading(), null != Note.contentAjax && Note.contentAjax.abort(), Note.contentAjax = ajaxGet(d, N, function(t) {
 				return function(e) {
 					delete e.IsBlog, n(e, t)
