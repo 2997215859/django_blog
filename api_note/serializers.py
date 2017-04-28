@@ -10,9 +10,15 @@ class NotebookSerializer(serializers.HyperlinkedModelSerializer):
 class NoteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Note
-        fields = ("url", "NoteId","IsTrash","CommentNum","Title","Usn","Tags","AttachNum","ImgSrc","CreatedTime","IsBlog","LikeNum","IsRecommend","UpdatedUserId","HasSelfDefined","IsPublicShare","ReadNum","UserId","PublicTime","IsTop","UpdatedTime","IsDeleted","Desc","Src","RecommendTime","NotebookId","IsMarkdown","CreatedUserId","UrlTitle", "Content")
+        fields = ("NoteId","url","IsTrash","CommentNum","Title","Usn","Tags","AttachNum","ImgSrc","CreatedTime","IsBlog","LikeNum","IsRecommend","UpdatedUserId","HasSelfDefined","IsPublicShare","ReadNum","UserId","PublicTime","IsTop","UpdatedTime","IsDeleted","Desc","Src","RecommendTime","NotebookId","IsMarkdown","CreatedUserId","UrlTitle", "Content")
 
 class TagSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Tag
         fields = ("url", "Count","UpdatedTime","Tag","CreatedTime","Usn","TagId","UserId","IsDeleted")
+
+
+class TrashNoteSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Note
+        fields = ("NoteId", "IsTrash")

@@ -31,6 +31,8 @@ api_router.register(r'user', UserViewSet)
 api_router.register(r'group', GroupViewSet)
 api_router.register(r'note', NoteViewSet)
 
+
+
 schema_view = get_schema_view(title='Pastebin API')
 urlpatterns = [
     url(r'^api/', include(api_router.urls)),

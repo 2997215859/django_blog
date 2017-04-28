@@ -50,9 +50,13 @@ function formSerializeDataToJson(t) {
 }
 function _ajaxCallback(t, e, n) {
 	if (t === !0 || "true" == t || "object" == typeof t) {
+		console.log("第一个")
 		if (t && "object" == typeof t && "NOTLOGIN" == t.Msg) return void alert(getMsg("Please sign in firstly!"));
 		"function" == typeof e && e(t)
 	} else "function" == typeof n ? n(t) : alert("error!")
+}
+function csrfSafeMethod(method){
+	return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 function _ajax(t, e, n, o, r, i) {
 	return i = "undefined" == typeof i ? !0 : !1, $.ajax({
@@ -60,6 +64,13 @@ function _ajax(t, e, n, o, r, i) {
 		url: e,
 		data: n,
 		async: i,
+		beforeSend: function (xhr, settings){
+			var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+			if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                console.log("setting X-CSRFToken")
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+		},
 		success: function(t) {
 			_ajaxCallback(t, o, r)
 		},
@@ -72,9 +83,20 @@ function ajaxGet(t, e, n, o, r) {
 	return _ajax("GET", t, e, n, o, r)
 }
 function ajaxPost(t, e, n, o, r) {
-    console.log("可怕")
+    console.log("post")
 	_ajax("POST", t, e, n, o, r)
 }
+function ajaxPut(t, e, n, o, r) {
+	console.log("61 line ", n)
+    console.log("put")
+	_ajax("PUT", t, e, n, o, r)
+}
+
+function ajaxDelete(t, e, n, o, r){
+	console.log("line96,准备删除")
+	_ajax("Delete", t, e, n, o, r)
+}
+
 function ajaxPostJson(t, e, n, o, r) {
 	r = "undefined" == typeof r ? !0 : !1, $.ajax({
 		url: t,
@@ -91,6 +113,7 @@ function ajaxPostJson(t, e, n, o, r) {
 		}
 	})
 }
+
 function findParents(t, e) {
 	if ($(t).is(e)) return $(t);
 	for (var n = $(t).parents(), o = 0; o < n.length; ++o) if (log(n.eq(o)), n.eq(o).is(e)) return n.seq(o);
@@ -736,8 +759,32 @@ Note.curNoteId = "", Note.interval = "", Note.itemIsBlog = '<div class="item-blo
 		} catch (i) {
 			return void(e && e(!1))
 		}
-		return n && n.hasChanged ? (log("需要保存..."), Note.renderChangedNote(n), delete n.hasChanged, showMsg(getMsg("saving")), a.saveInProcess[n.NoteId] = !0, ajaxPost("/note/updateNoteOrContent", n, function(t) {
-			a.saveInProcess[n.NoteId] = !1, "object" == typeof t && t.Ok ? (n.IsNew && (t.Item.IsNew = !1, Note.setNoteCache(t.Item, !1), Pjax.changeNote(t.Item)), showMsg(getMsg("saveSuccess"), 1e3)) : alert(getMsg("saveError")), e && e()
+		// /note/updateNoteOrContent
+		// /api/note/
+
+/*function _ajax(t, e, n, o, r, i) {
+	return i = "undefined" == typeof i ? !0 : !1, $.ajax({
+		type: t,
+		url: e,
+		data: n,
+		async: i,
+		beforeSend: function (xhr, settings){
+			var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+			if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                console.log("setting X-CSRFToken")
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+		},
+		success: function(t) {
+			_ajaxCallback(t, o, r)
+		},
+		error: function(t) {
+			_ajaxCallback(t, o, r)
+		}
+	})*/
+		return n && n.hasChanged ? (log("需要保存..."), Note.renderChangedNote(n), delete n.hasChanged, showMsg(getMsg("saving")), a.saveInProcess[n.NoteId] = !0, ajaxPut("/api/note/" + n.NoteId + "/", n, function(t) {
+			console.log("弹出前", t)
+			a.saveInProcess[n.NoteId] = !1, "object" == typeof t && /*t.Ok*/ true ? (n.IsNew && (t.Item.IsNew = !1, Note.setNoteCache(t.Item, !1), Pjax.changeNote(t.Item)), showMsg(getMsg("saveSuccess"), 1e3)) : alert(getMsg("saveError")), e && e()
 		}), void 0 != n.Tags && "string" == typeof n.Tags && (n.Tags = n.Tags.split(",")), Note.setNoteCache(n, !1), Note.setNoteCache({
 			NoteId: n.NoteId,
 			UpdatedTime: (new Date).format("yyyy-MM-ddThh:mm:ss.S")
@@ -831,6 +878,7 @@ Note.curNoteId = "", Note.interval = "", Note.itemIsBlog = '<div class="item-blo
 }, Note.clearAll = function() {
 	Note.clearCurNoteId(), Note.clearNoteInfo(), Note.clearNoteList()
 }, Note.renderNote = function(t) {
+	console.log("853 line", t)
 	t && ($("#noteTitle").val(t.Title), Tag.renderTags(t.Tags))
 }, Note.renderNoteContent = function(t) {
 	setEditorContent(t.Content, t.IsMarkdown, t.Preview, function() {
@@ -991,12 +1039,18 @@ Note.checkSorter = function(t) {
 	}
 }, Note.deleteNote = function(t, e, o) {
 	var a, n = Note;
+
 	if (a = n.inBatch ? n.getBatchNoteIds() : [$(t).attr("noteId")], !isEmpty(a)) {
 		1 == a.length && $(t).hasClass("item-active") && (Note.stopInterval(), n.clearCurNoteId(), Note.clearNoteInfo());
 		var i;
-		i = 1 == a.length ? $(t) : n.$itemList.find(".item-active"), i.hide(), ajaxPost("/note/deleteNote", {
-			noteIds: a,
-			isShared: o
+		// i = 1 == a.length ? $(t) : n.$itemList.find(".item-active"), i.hide(), ajaxPost("/note/deleteNote", {
+		console.log("a", a)
+		console.log(typeof(a))
+		i = 1 == a.length ? $(t) : n.$itemList.find(".item-active"), i.hide(), ajaxPut("/api/note/" + a + "/", {
+			// noteIds: a,
+			NoteId: a.join(""),
+			isShared: o,
+			IsTrash: true
 		}, function(t) {
 			if (t) {
 				Note.changeToNextSkipNotes(a), i.remove();
@@ -2305,15 +2359,23 @@ Tag.classes = {
 	var a = [];
 	return Tag.t.children().each(function() {
 		var e = $(this).data("tag");
+		console.log('2327line', e)
 		e = Tag.mapCn2En[e] || e, a.push(e)
 	}), a
 }, Tag.clearTags = function() {
 	Tag.t.html("")
 }, Tag.renderTags = function(a) {
+	console.log("2333 a =", a)
 	if (Tag.t.html(""), !isEmpty(a)) for (var e = 0; e < a.length; ++e) {
 		var t = a[e];
+		console.log("2335", t)
 		Tag.appendTag(t)
 	}
+/*	if (Tag.t.html(""), !isEmpty(a)) for (var e = 0; e < a.length; ++e) {
+		var t = a[e];
+		console.log("2335", t)
+		Tag.appendTag(t)
+	}*/
 }, Tag.renderReadOnlyTags = function(a) {
 	function e() {
 		return t ? "label label-default" : (t = !0, "label label-info")
@@ -2327,6 +2389,7 @@ Tag.classes = {
 		n || (n = e()), tag = tt('<span class="?">?</span>', n, trimTitle(l)), $("#noteReadTags").append(tag)
 	}
 }, Tag.appendTag = function(a, e) {
+	console.log("2357 line", a)
 	var t, l, n = !1;
 	if ("object" == typeof a) {
 		if (t = a.classes, l = a.text, !l) return
@@ -2701,7 +2764,9 @@ Notebook.curNotebookId = "", Notebook.cache = {}, Notebook.notebooks = [], Noteb
 }, Notebook.changeNotebookSeq = 1, Notebook.changeNotebook = function(o, e) {
 	var t = this;
 	Notebook.changeNotebookNav(o), Notebook.curNotebookId = o, Note.curChangedSaveIt(), Note.clearAll();
-	var N = "/note/listNotes/",
+	// var N = "/note/listNotes/",
+	console.log("2796 line", o)
+	var N = "/api/note/sub_list/",
 		a = {
 			notebookId: o
 		};
@@ -2729,7 +2794,9 @@ Notebook.curNotebookId = "", Notebook.cache = {}, Notebook.notebooks = [], Noteb
 }, Notebook.changeNotebookForNewNote = function(o) {
 	if (!Notebook.isTrashNotebookId(o) && !Notebook.isAllNotebookId(o)) {
 		Notebook.changeNotebookNav(o, !0), Notebook.curNotebookId = o;
-		var e = "/note/listNotes/",
+		// var e = "/note/listNotes/",
+		console.log("2797line", o)
+		var N = "/api/note/sub_list/?notebookId=" + o,
 			t = {
 				notebookId: o
 			};
