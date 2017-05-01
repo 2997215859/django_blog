@@ -22,3 +22,4 @@ class TrashNoteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Note
         fields = ("NoteId", "IsTrash")
+

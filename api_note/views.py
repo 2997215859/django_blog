@@ -13,6 +13,7 @@ from rest_framework.request import Request
 from rest_framework.decorators import list_route, detail_route
 from rest_framework import status
 
+import json
 
 class NotebookViewSet(viewsets.ModelViewSet):
     queryset = Notebook.objects.all()
@@ -24,15 +25,48 @@ class NoteViewSet(viewsets.ModelViewSet):
     serializer_class = NoteSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-    @detail_route(methods=['put'])
-    def trash(self, request, pk=None):
-        note = self.get_object()
-        serializer = TrashNoteSerializer(data=request.data)
-        if serializer.is_valid():
-            note.IsTrash = serializer.data['IsTrash']
-            note.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @list_route(methods=['post'])
+    def move_note(self, request):
+        notebook_id = request.POST.getlist("notebookId")[0]
+        note_ids = request.POST.getlist("noteIds[]", [])
+        move_num = 0
+
+        for note_id in note_ids:
+            try:
+                note = Note.objects.get(NoteId=note_id)
+                pre_notebook = Notebook.objects.get(NotebookId=note.NotebookId)
+                pre_notebook.NumberNotes -= 1
+                pre_notebook.save()
+                note.NotebookId = notebook_id
+                note.save()
+                move_num = move_num + 1
+            except Note.DoesNotExist:
+                return Response({"status": "query info is not found"}, status=status.HTTP_404_NOT_FOUND)
+            except Notebook.DoesNotExist:
+                return Response({"status": "query info is not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            notebook = Notebook.objects.get(NotebookId=notebook_id)
+            notebook.NumberNotes += move_num
+            notebook.save()
+        except Notebook.DoesNotExist:
+            return Response({"status": "query info is not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(True)
+
+    @list_route(methods=['post'])
+    def trash_note(self, request):
+        pass
+
+    @list_route(methods=['get'])
+    def trash_list(self, request):
+        try:
+            notes = Note.objects.filter(IsTrash=True)
+        except Note.DoesNotExist:
+            return Response({"status": "query info is not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = NoteSerializer(notes, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @list_route(methods=['get'])
     def sub_list(self, request, *args, **kwargs):
@@ -51,8 +85,6 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permissions_class = (permissions.IsAuthenticated)
-
-
 
 # class NotebookList(generics.ListCreateAPIView):
 #     """

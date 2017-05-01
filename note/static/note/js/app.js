@@ -1139,7 +1139,10 @@ Note.checkSorter = function(t) {
 			var i = a.getNote(o[0]);
 			if (!i.IsTrash && i.NotebookId == n) return
 		}
-		ajaxPost("/note/moveNote", {
+		// ajaxPost("/note/moveNote", {
+		// 	noteIds: o,
+		// 	notebookId: n
+		ajaxPost("/api/note/move_note/" ,{
 			noteIds: o,
 			notebookId: n
 		}, function(e) {
@@ -2770,7 +2773,8 @@ Notebook.curNotebookId = "", Notebook.cache = {}, Notebook.notebooks = [], Noteb
 		a = {
 			notebookId: o
 		};
-	if (Notebook.isTrashNotebookId(o)) N = "/note/listTrashNotes", a = {};
+	// if (Notebook.isTrashNotebookId(o)) N = "/note/listTrashNotes", a = {};
+	if (Notebook.isTrashNotebookId(o)) N = "/api/note/trash_list", a = {};
 	else if (Notebook.isAllNotebookId(o)) {
 		if (a = {}, cacheNotes = Note.getNotesByNotebookId(), !isEmpty(cacheNotes)) return void(e ? e(cacheNotes) : Note.renderNotesAndFirstOneContent(cacheNotes, !0))
 	} else {
