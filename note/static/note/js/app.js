@@ -1046,11 +1046,13 @@ Note.checkSorter = function(t) {
 		// i = 1 == a.length ? $(t) : n.$itemList.find(".item-active"), i.hide(), ajaxPost("/note/deleteNote", {
 		console.log("a", a)
 		console.log(typeof(a))
-		i = 1 == a.length ? $(t) : n.$itemList.find(".item-active"), i.hide(), ajaxPut("/api/note/" + a + "/", {
+		// i = 1 == a.length ? $(t) : n.$itemList.find(".item-active"), i.hide(), ajaxPut("/api/note/" + a + "/", {
 			// noteIds: a,
-			NoteId: a.join(""),
+			// NoteId: a.join(""),
+		i = 1 == a.length ? $(t) : n.$itemList.find(".item-active"), i.hide(), ajaxPost("/api/note/trash_note/", {
+			noteIds: a,
 			isShared: o,
-			IsTrash: true
+			// IsTrash: true
 		}, function(t) {
 			if (t) {
 				Note.changeToNextSkipNotes(a), i.remove();

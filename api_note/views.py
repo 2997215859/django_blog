@@ -35,28 +35,38 @@ class NoteViewSet(viewsets.ModelViewSet):
             try:
                 note = Note.objects.get(NoteId=note_id)
                 pre_notebook = Notebook.objects.get(NotebookId=note.NotebookId)
-                pre_notebook.NumberNotes -= 1
-                pre_notebook.save()
-                note.NotebookId = notebook_id
-                note.save()
-                move_num = move_num + 1
             except Note.DoesNotExist:
                 return Response({"status": "query info is not found"}, status=status.HTTP_404_NOT_FOUND)
             except Notebook.DoesNotExist:
                 return Response({"status": "query info is not found"}, status=status.HTTP_404_NOT_FOUND)
 
+            pre_notebook.NumberNotes -= 1
+            pre_notebook.save()
+            note.NotebookId = notebook_id
+            note.save()
+            move_num = move_num + 1
+
         try:
             notebook = Notebook.objects.get(NotebookId=notebook_id)
-            notebook.NumberNotes += move_num
-            notebook.save()
         except Notebook.DoesNotExist:
             return Response({"status": "query info is not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        notebook.NumberNotes += move_num
+        notebook.save()
 
         return Response(True)
 
     @list_route(methods=['post'])
     def trash_note(self, request):
-        pass
+        note_ids = request.POST.getlist('noteIds[]', [])
+        for note_id in note_ids:
+            try:
+                note = Note.objects.get(NoteId = note_id)
+            except Note.DoesNotExist:
+                return Response({"status": "query info is not found"}, status=status.HTTP_404_NOT_FOUND)
+            note.IsTrash = True
+            note.save()
+        return Response(True)
 
     @list_route(methods=['get'])
     def trash_list(self, request):
