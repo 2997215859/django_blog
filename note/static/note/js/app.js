@@ -782,7 +782,8 @@ Note.curNoteId = "", Note.interval = "", Note.itemIsBlog = '<div class="item-blo
 			_ajaxCallback(t, o, r)
 		}
 	})*/
-		return n && n.hasChanged ? (log("需要保存..."), Note.renderChangedNote(n), delete n.hasChanged, showMsg(getMsg("saving")), a.saveInProcess[n.NoteId] = !0, ajaxPut("/api/note/" + n.NoteId + "/", n, function(t) {
+		return n && n.hasChanged ? (log("需要保存..."), Note.renderChangedNote(n), delete n.hasChanged, showMsg(getMsg("saving")), a.saveInProcess[n.NoteId] = !0,
+			ajaxPost("/api/note/update_note_or_content/", n, function(t) {
 			console.log("弹出前", t)
 			a.saveInProcess[n.NoteId] = !1, "object" == typeof t && /*t.Ok*/ true ? (n.IsNew && (t.Item.IsNew = !1, Note.setNoteCache(t.Item, !1), Pjax.changeNote(t.Item)), showMsg(getMsg("saveSuccess"), 1e3)) : alert(getMsg("saveError")), e && e()
 		}), void 0 != n.Tags && "string" == typeof n.Tags && (n.Tags = n.Tags.split(",")), Note.setNoteCache(n, !1), Note.setNoteCache({
@@ -795,7 +796,8 @@ Note.curNoteId = "", Note.interval = "", Note.itemIsBlog = '<div class="item-blo
 	for (var e in t.savePool) if (e) {
 		delete t.savePool[e];
 		var o = t.savePool[e];
-		t.saveInProcess[e] = !0, ajaxPost("/note/updateNoteOrContent", o, function() {
+		// t.saveInProcess[e] = !0, ajaxPost("/note/updateNoteOrContent", o, function() {
+		t.saveInProcess[e] = !0, ajaxPost("/api/note/update_note_or_content/", o, function() {
 			t.saveInProcess[e] = !1
 		})
 	}
@@ -2412,7 +2414,8 @@ Tag.classes = {
 			e == a && ($(this).remove(), s = !0)
 		} else l + "X" == $(this).text() && ($(this).remove(), s = !0)
 	}), $("#tags").append(a), hideTagList(), n || reRenderTags(), e && (s || Note.curChangedSaveIt(!0, function() {
-		ajaxPost("/tag/updateTag", {
+		// ajaxPost("/tag/updateTag", {
+		ajaxPost("/api/tag/update_tag/", {
 			tag: g
 		}, function(a) {
 			reIsOk(a) && Tag.addTagNav(a.Item)
@@ -2802,7 +2805,8 @@ Notebook.curNotebookId = "", Notebook.cache = {}, Notebook.notebooks = [], Noteb
 		Notebook.changeNotebookNav(o, !0), Notebook.curNotebookId = o;
 		// var e = "/note/listNotes/",
 		console.log("2797line", o)
-		var N = "/api/note/sub_list/?notebookId=" + o,
+		// var N = "/api/note/sub_list/?notebookId=" + o,
+		var e = "/api/note/sub_list/",
 			t = {
 				notebookId: o
 			};

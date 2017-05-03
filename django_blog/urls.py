@@ -21,7 +21,7 @@ from rest_framework import routers, serializers, viewsets
 from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
 
-from api_note.views import NotebookViewSet, NoteViewSet, TagViewSet
+from api_note.views import NotebookViewSet, NoteViewSet, TagViewSet, AlbumViewSet
 from user_group.views import UserViewSet, GroupViewSet
 
 api_router = DefaultRouter()
@@ -30,6 +30,7 @@ api_router.register(r'notebook', NotebookViewSet)
 api_router.register(r'user', UserViewSet)
 api_router.register(r'group', GroupViewSet)
 api_router.register(r'note', NoteViewSet)
+api_router.register(r'album', AlbumViewSet)
 
 
 

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import Notebook, Note, Tag
+from models import Notebook, Note, Tag, Album
 from django.contrib.auth.models import User
 
 class NotebookSerializer(serializers.HyperlinkedModelSerializer):
@@ -22,4 +22,9 @@ class TrashNoteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Note
         fields = ("NoteId", "IsTrash")
+
+class AlbumSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Album
+        fields = ("AlbumId", "CreatedTime", "Name", "Seq", "Type", "UserId")
 
