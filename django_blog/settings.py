@@ -140,6 +140,11 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static').replace('\\','/'), # 首选project静态文件搜寻路径
 )
 
+## 媒体文件
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname('__file__')))
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/')     #设置静态文件路径为主目录下的media文件夹
+MEDIA_URL = '/media/'
 # configuration for REST_FRAMEWORK
 REST_FRAMEWORK = {
     # Use Django's standard 'django.contrib.auth' permissions,

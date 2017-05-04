@@ -15,13 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
 from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
 
-from api_note.views import NotebookViewSet, NoteViewSet, TagViewSet, AlbumViewSet
+from api_note.views import NotebookViewSet, NoteViewSet, TagViewSet, AlbumViewSet, ImageViewSet
 from user_group.views import UserViewSet, GroupViewSet
 
 api_router = DefaultRouter()
@@ -31,6 +33,7 @@ api_router.register(r'user', UserViewSet)
 api_router.register(r'group', GroupViewSet)
 api_router.register(r'note', NoteViewSet)
 api_router.register(r'album', AlbumViewSet)
+api_router.register(r'image', ImageViewSet)
 
 
 
@@ -42,5 +45,6 @@ urlpatterns = [
     url(r'blog/', include('blog.urls', namespace = 'blog')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', admin.site.urls),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 

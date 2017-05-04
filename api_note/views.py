@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
 
-from models import Notebook, Note, Tag, Album
-from serializers import NotebookSerializer, NoteSerializer, TagSerializer, TrashNoteSerializer, AlbumSerializer
+from models import Notebook, Note, Tag, Album, Image
+from serializers import NotebookSerializer, NoteSerializer, TagSerializer, TrashNoteSerializer, AlbumSerializer, ImageSerializer
 from rest_framework import permissions
-
+from django.http import HttpResponse
 from rest_framework import renderers
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
@@ -14,10 +14,11 @@ from rest_framework.decorators import list_route, detail_route
 from rest_framework import status
 from django.db.models import Q
 
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
-import json
+import json, os
 import hashlib
-
+import time
 
 def get_md5_value(src):
     m = hashlib.md5()
@@ -31,6 +32,44 @@ def get_sha1_value(src):
     sha1.update(src)
     sha1_digest = sha1.hexdigest()
     return sha1_digest
+
+def get_file_sha1(filepath):
+    with open(filepath,'rb') as f:
+        sha1obj = hashlib.sha1()
+        sha1obj.update(f.read())
+        hash = sha1obj.hexdigest()
+        print(hash)
+        return hash
+
+def get_file_md5(filepath_or_file):
+    if isinstance(filepath_or_file, str):
+        with open(filepath_or_file,'rb') as f:
+            md5obj = hashlib.md5()
+            md5obj.update(f.read())
+            hash = md5obj.hexdigest()
+            print("test1 : " + hash)
+            return hash
+    else:
+        md5obj = hashlib.md5()
+        md5obj.update(filepath_or_file.read())
+        hash = md5obj.hexdigest()
+        print("test2 : " + hash)
+        return hash
+
+
+#大文件的MD5值
+def get_super_file_md5(filename):
+    if not os.path.isfile(filename):
+        return
+    myhash = hashlib.md5()
+    f = file(filename,'rb')
+    while True:
+        b = f.read(8096)
+        if not b :
+            break
+        myhash.update(b)
+    f.close()
+    return myhash.hexdigest()
 
 class NotebookViewSet(viewsets.ModelViewSet):
     queryset = Notebook.objects.all()
@@ -163,14 +202,15 @@ class AlbumViewSet(viewsets.ModelViewSet):
            "Msg": ""
            }
     @list_route(methods=['get'])
-    def get_album(self, request):
+    def get_album(self, request, *args, **kwargs):
         try:
-            albums = Album.objects.get(~Q(AlbumId= ''))
+            albums = Album.objects.filter(~Q(AlbumId= ""))
         except Album.DoesNotExist:
             return Response([])
 
-        serializer = AlbumSerializer(data=albums, many=True)
-        return Response(serializer.data)
+        serializer = AlbumSerializer(albums, many=True,context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
     @list_route(methods=['get'])
     def add_album(self, request):
@@ -222,21 +262,90 @@ class AlbumViewSet(viewsets.ModelViewSet):
             return Response(self.res, status=status.HTTP_400_BAD_REQUEST)
 
 class ImageViewSet(viewsets.ModelViewSet):
-    queryset = Tag.objects.all()
-    serializer_class = TagSerializer
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer
     permissions_class = (permissions.IsAuthenticated)
 
     res = {"Ok": False,
-           "Code": 0,
+           "Code": 1,
            "Id": "",
            "Item": None,
            "List": None,
            "Msg": ""
            }
 
+    image_res = {
+        "Count":0,
+        "CurPage":0,
+        "List":None,
+        "PerPageSize":0,
+        "TotalPage":0
+    }
     @list_route(methods=["POST"])
     def upload_image(self, request):
-        pass
+        photo = request.FILES.get('file')
+        album_id = request.POST.get('albumId')
+        file_id = get_file_md5(photo) + str(int(time.time()))
+        title = request.POST.get('title', '无标题')
+        if album_id=="" or album_id is None:
+            is_default_album = True
+        else:
+            is_default_album = False
+
+        new_img = Image(
+            Photo=photo,
+            AlbumId=album_id ,
+            FileId=file_id,
+            Name=photo.name,
+            Title=title,
+            IsDefaultAlbum = is_default_album,
+            Size=photo.size
+            )
+        new_img.save()
+        new_img.Path = new_img.Photo.path.decode('utf8')
+        new_img.Name = new_img.Photo.name.decode('utf8')
+        try:
+            new_img.save()
+        except Exception, e:
+            print e
+
+        new_img = Image.objects.get(FileId=file_id)
+        serializer = ImageSerializer(new_img)
+        self.res['Id'] = new_img.FileId
+        self.res['List'] = serializer.data
+        self.res['Ok'] = True
+        return Response(self.res, status=status.HTTP_200_OK)
+
+    @list_route(methods=["GET"])
+    def get_images(self, request):
+        album_id = request.GET.get("albumId")
+        page = request.GET.get("page", 1)
+        page_size = request.GET.get('page_size', 12)
+        images = Image.objects.filter(AlbumId=album_id)
+
+        paginator = Paginator(images, page)
+
+        try:
+            images = paginator.page(page)
+        except PageNotAnInteger:
+            images = paginator.page(1)
+        except EmptyPage:
+            images = paginator.page(paginator.num_pages) # paginator.num_pages 总页数
+
+        serializer = ImageSerializer(images, many=True)  # 序列化操作
+        self.image_res["Count"] = images.number
+        self.image_res["List"] = serializer.data
+        return Response(self.image_res, status=status.HTTP_200_OK)
+
+    @list_route(methods=['get'])
+    def get_image(self,request,*args,**kwargs):
+        file_id = request.GET.get('fileId')
+        image = Image.objects.get(FileId=file_id)
+        # serializer = ImageSerializer(image)
+        # return Response(serializer.data, status=status.HTTP_200_OK)
+        # return Response(image.Path)
+        f = open(image.Path, 'rb')
+        return HttpResponse(f.read(), content_type='image/jpg')
 
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()

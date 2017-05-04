@@ -78,13 +78,14 @@ class Album(models.Model):
     UserId = models.CharField(max_length=50, default="57cccf2aab644133ed0714c2")
 
 class Image(models.Model):
+    Photo = models.ImageField(upload_to='imgs/', default='upload_imgs/user-0.jpg')
     AlbumId = models.CharField(max_length=50)
     CreatedTime = models.DateTimeField(auto_now_add=True)
-    FileId = models.CharField(max_length=50)
+    FileId = models.CharField(max_length=100)
     FromFieldId = models.CharField(max_length=50,default="")
     IsDefaultAlbum = models.BooleanField()
-    Name = models.CharField(max_length=100)
-    Path = models.CharField(max_length=50, default="")
+    Name = models.CharField(max_length=50)
+    Path = models.CharField(max_length=100, default="")
     QID = models.CharField(max_length=50, default="")
     QKey = models.CharField(max_length=50, default="")
     Size = models.CharField(max_length=50, default="")
