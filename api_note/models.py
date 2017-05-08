@@ -57,8 +57,6 @@ class Note(models.Model):
     Content = models.TextField(default="")
     Abstract = models.TextField(default="")
 
-
-
 class Tag(models.Model):
     TagId = models.CharField(max_length=50, primary_key=True)
     UserId = models.CharField(max_length=50, default="57cccf2aab644133ed0714c2")

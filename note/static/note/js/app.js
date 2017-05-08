@@ -325,7 +325,7 @@ function setCookie(t, e, n) {
 	o.setDate(o.getDate() + n), document.cookie = t + "=" + escape(e) + (null == n ? "" : ";expires=" + o.toGMTString()) + ";domain=leanote.com;path=/", document.cookie = t + "=" + escape(e) + (null == n ? "" : ";expires=" + o.toGMTString()) + ";domain=leanote.com;path=/note", document.cookie = t + "=" + escape(e) + (null == n ? "" : ";expires=" + o.toGMTString())
 }
 function logout() {
-	Note.curChangedSaveIt(!0), LEA.isLogout = !0, setCookie("LEANOTE_SESSION", "", -1), location.href = "/logout?id=1"
+	Note.curChangedSaveIt(!0), LEA.isLogout = !0, setCookie("LEANOTE_SESSION", "", -1),location.href = "/api-auth/login/" /*location.href = "/logout?id=1"*/
 }
 function getImageSize(t, e) {
 	function n(t, n) {
@@ -837,6 +837,10 @@ Note.curNoteId = "", Note.interval = "", Note.itemIsBlog = '<div class="item-blo
 		}), o && (i ? $("#myShareNotebooks").hasClass("closed") && $("#myShareNotebooks .folderHeader").trigger("click") : $("#myNotebooks").hasClass("closed") && $("#myNotebooks .folderHeader").trigger("click"), Notebook.expandNotebookTo(n.NotebookId))
 	}
 }, Note.contentAjax = null, Note.contentAjaxSeq = 1, Note.changeNote = function(t, e, o, a) {
+	console.log('840 line', t)
+	console.log('841 line', e)
+	console.log('842 line', o)
+	console.log('843 line', a)
 	function n(e, o) {
 		Note.contentAjax = null, o == Note.contentAjaxSeq && (Note.setNoteCache(e, !1), e = Note.cache[t], Note.renderNoteContent(e), i.hideContentLoading(), a && a(e))
 	}
@@ -849,9 +853,12 @@ Note.curNoteId = "", Note.interval = "", Note.itemIsBlog = '<div class="item-blo
 		}
 		Note.clearCurNoteId();
 		var s = i.getNote(t);
+		console.log("856 line", s)
+		console.log("857 line", s.Tags)
 		if (s) {
 			e || void 0 != s.Perm && (e = !0);
 			var c = !e || Share.hasUpdatePerm(t);
+			console.log("line 855", s)
 			c ? (Note.hideReadOnly(), Note.renderNote(s)) : Note.renderNoteReadOnly(s), switchEditor(s.IsMarkdown), LEA.trigger("noteChanged", s), Attach.renderNoteAttachNum(t, !0), Note.contentAjaxSeq++;
 			var l = Note.contentAjaxSeq;
 			if (s.Content) return void n(s, l);
@@ -881,6 +888,8 @@ Note.curNoteId = "", Note.interval = "", Note.itemIsBlog = '<div class="item-blo
 	Note.clearCurNoteId(), Note.clearNoteInfo(), Note.clearNoteList()
 }, Note.renderNote = function(t) {
 	console.log("853 line", t)
+	console.log("854 line")
+	console.log("855 line", t.Tags, t)
 	t && ($("#noteTitle").val(t.Title), Tag.renderTags(t.Tags))
 }, Note.renderNoteContent = function(t) {
 	setEditorContent(t.Content, t.IsMarkdown, t.Preview, function() {
@@ -988,6 +997,7 @@ Note.checkSorter = function(t) {
 }, Note.newNoteSeq = function() {
 	return --this._seqForNew
 }, Note.newNote = function(t, e, o, a) {
+	console.log("line 1012", n);
 	t || (t = $("#curNotebookForNewNote").attr("notebookId")), switchEditor(a), Note.hideEditorMask(), Note.hideReadOnly(), Note.stopInterval(), Note.curChangedSaveIt(), Note.batch.reset();
 	var n = {
 		NoteId: getObjectId(),
@@ -1008,7 +1018,7 @@ Note.checkSorter = function(t) {
 	var s = Notebook.getNotebook(t),
 		c = s ? s.Title : "",
 		l = getCurDate();
-	i = e ? tt(Note.newItemTpl, r, this.newNoteSeq(), o, n.NoteId, n.Title, c, l, "") : tt(Note.newItemTpl, r, this.newNoteSeq(), "", n.NoteId, n.Title, c, l, ""), i = $(i), s.IsBlog ? i.addClass("item-b") : i.removeClass("item-b"), Notebook.isCurNotebook(t) ? Note.noteItemListO.prepend(i) : (Note.clearAll(), Note.noteItemListO.prepend(i), e ? Share.changeNotebookForNewNote(t) : Notebook.changeNotebookForNewNote(t)), Note.selectTarget($(tt('[noteId="?"]', n.NoteId))), $("#noteTitle").focus(), Note.renderNote(n), Note.renderNoteContent(n), Note.setCurNoteId(n.NoteId), Notebook.incrNotebookNumberNotes(t), Note.toggleWriteable(!0)
+	i = e ? tt(Note.newItemTpl, r, this.newNoteSeq(), o, n.NoteId, n.Title, c, l, "") : tt(Note.newItemTpl, r, this.newNoteSeq(), "", n.NoteId, n.Title, c, l, ""), i = $(i), s.IsBlog ? i.addClass("item-b") : i.removeClass("item-b"), Notebook.isCurNotebook(t) ? Note.noteItemListO.prepend(i) : (Note.clearAll(), Note.noteItemListO.prepend(i), e ? Share.changeNotebookForNewNote(t) : Notebook.changeNotebookForNewNote(t)), Note.selectTarget($(tt('[noteId="?"]', n.NoteId))), $("#noteTitle").focus(),Note.renderNote(n), Note.renderNoteContent(n), Note.setCurNoteId(n.NoteId), Notebook.incrNotebookNumberNotes(t), Note.toggleWriteable(!0)
 }, Note.changeToNext = function(t) {
 	var e = $(t),
 		o = e.next();
@@ -1112,7 +1122,7 @@ Note.checkSorter = function(t) {
 	Note._setBlog(t, !1)
 }, Note._setBlog = function(t, e) {
 	var o, a = Note;
-	o = Note.inBatch ? a.getBatchNoteIds() : [$(t).attr("noteId")], ajaxPost("/note/setNote2Blog", {
+	o = Note.inBatch ? a.getBatchNoteIds() : [$(t).attr("noteId")], ajaxPost(/*/note/setNote2Blog*/"/api/note/set_note_to_blog/", {
 		noteIds: o,
 		isBlog: e
 	}, function(t) {
@@ -1795,8 +1805,10 @@ function initPage() {
 	}) : _initPage()
 }
 function _initPage(e, t) {
+	console.log("1808 line", e, t);
 	if (e ? (curNoteId = e.NoteId, curNotebookId = e.NotebookId, noteContentJson = e) : t && (curNoteId = null), Notebook.renderNotebooks(notebooks), Share.renderShareNotebooks(sharedUserInfos, shareNotebooks), curSharedNoteNotebookId) Share.firstRenderShareNote(curSharedUserId, curSharedNoteNotebookId, curNoteId);
 	else {
+		console.log("line 1810", noteContentJson.Tags)
 		Note.setNoteCache(noteContentJson);
 		var o = !1;
 		if (t && e && notes) {
@@ -2408,7 +2420,9 @@ Tag.classes = {
 	var g = l;
 	"zh" == LEA.locale && (l = Tag.mapEn2Cn[l] || l, g = Tag.mapCn2En[g] || g), a = tt('<span class="?" data-tag="?">?<i title="' + getMsg("delete") + '">X</i></span>', t, l, l);
 	var s = !1;
+	console.log("2411 line",a)
 	$("#tags").children().each(function() {
+		console.log("2412 line",a)
 		if (n) {
 			var e = $("<div></div>").append($(this).clone()).html();
 			e == a && ($(this).remove(), s = !0)
@@ -2851,7 +2865,7 @@ Notebook.curNotebookId = "", Notebook.cache = {}, Notebook.notebooks = [], Noteb
 	e.tree2 ? e.tree2.editName(e.tree2.getNodeByTId(t)) : e.tree.editName(e.tree.getNodeByTId(t))
 }, Notebook.doUpdateNotebookTitle = function(o, e) {
 	var t = Notebook;
-	ajaxPost("/notebook/updateNotebookTitle", {
+	ajaxPost(/*/notebook/updateNotebookTitle*/"/api/notebook/update_notebook_title/", {
 		notebookId: o,
 		title: e
 	}, function() {

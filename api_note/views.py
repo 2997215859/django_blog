@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from models import Notebook, Note, Tag, Album, Image
-from serializers import NotebookSerializer, NoteSerializer, TagSerializer, TrashNoteSerializer, AlbumSerializer, ImageSerializer
+from serializers import NotebookSerializer, NoteSerializer, TagSerializer, TrashNoteSerializer, AlbumSerializer, ImageSerializer, GetNoteContentSerializer
 from rest_framework import permissions
 from django.http import HttpResponse
 from rest_framework import renderers
@@ -76,6 +76,19 @@ class NotebookViewSet(viewsets.ModelViewSet):
     serializer_class = NotebookSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
+    @list_route(methods=['post'])
+    def update_notebook_title(self, request, *args, **kwargs):
+        notebook_id = request.POST.get('notebookId')
+        title = request.POST.get('title')
+        try:
+            notebook = Notebook.objects.get(NotebookId=notebook_id)
+        except Notebook.DoesNotExist:
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+        notebook.Title = title
+        notebook.save()
+        return Response(True, status=status.HTTP_200_OK)
+
 class NoteViewSet(viewsets.ModelViewSet):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
@@ -99,9 +112,9 @@ class NoteViewSet(viewsets.ModelViewSet):
                 note = Note.objects.get(NoteId=note_id)
                 pre_notebook = Notebook.objects.get(NotebookId=note.NotebookId)
             except Note.DoesNotExist:
-                return Response({"status": "query info is not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response(False, status=status.HTTP_404_NOT_FOUND)
             except Notebook.DoesNotExist:
-                return Response({"status": "query info is not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response(False, status=status.HTTP_404_NOT_FOUND)
 
             pre_notebook.NumberNotes -= 1
             pre_notebook.save()
@@ -112,12 +125,12 @@ class NoteViewSet(viewsets.ModelViewSet):
         try:
             notebook = Notebook.objects.get(NotebookId=notebook_id)
         except Notebook.DoesNotExist:
-            return Response({"status": "query info is not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
 
         notebook.NumberNotes += move_num
         notebook.save()
 
-        return Response(True)
+        return Response(True, status=status.HTTP_200_OK)
 
     @list_route(methods=['post'])
     def trash_note(self, request):
@@ -144,8 +157,9 @@ class NoteViewSet(viewsets.ModelViewSet):
             serializer = NoteSerializer(note, data=request.data, context={'request': request})
 
         if serializer.is_valid():
-            en_tags = request.POST.get('Tags').split(',')
+            en_tags = request.POST.get('Tags', "").split(',')
             zh_tags = []
+            print en_tags
             for en_tag in en_tags:
                 if en_tag == 'red':
                     zh_tags.append('红色'.decode('utf8'))
@@ -157,10 +171,10 @@ class NoteViewSet(viewsets.ModelViewSet):
                     zh_tags.append('蓝色'.decode('utf8'))
                 else:
                     zh_tags.append(en_tag)
-
-            serializer.save(Tags = zh_tags)
+            print zh_tags
+            serializer.save(Tags=zh_tags)
             self.res["Ok"] = True
-            self.res["Item"] = serializer.data
+            # self.res["Item"] = serializer.data
             return Response(self.res, status=status.HTTP_200_OK)
         else:
             self.res["Ok"] = False
@@ -188,6 +202,45 @@ class NoteViewSet(viewsets.ModelViewSet):
 
         serializer = NoteSerializer(notes, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @list_route(methods=['get'])
+    def get_note_content(self, request, *args, **kwargs):
+        note_id = request.GET.get('noteId')
+        try:
+            note = Note.objects.get(NoteId=note_id)
+        except Note.DoesNotExist:
+            return Response({"status": "query info is not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = GetNoteContentSerializer(note, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @list_route(methods=['get'])
+    def latest_note(self, request, *args, **kwargs):
+        query_num = 50
+        if Note.objects.all().count() < query_num:
+            serializer = NoteSerializer(Note.objects.all(), many=True, context={'request': request});
+        else:
+            serializer = NoteSerializer(Note.objects.all().order_by("UpdatedTime")[:query_num], many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @list_route(methods=['post'])
+    def set_note_to_blog(self, request, *args, **kwargs):
+        note_ids = request.POST.getlist("noteIds[]", [])
+        is_blog = request.POST.get('isBlog')
+        if is_blog == "true":
+            is_blog = True
+        elif is_blog == "false":
+            is_blog = False
+        else:
+            return Response(False, status=status.HTTP_400_BAD_REQUEST)
+        for note_id in note_ids:
+            try:
+                note = Note.objects.get(NoteId=note_id)
+            except Note.DoesNotExist:
+                return Response(False, status=status.HTTP_404_NOT_FOUND)
+            note.IsBlog = is_blog
+            note.save()
+        return Response(True, status=status.HTTP_200_OK)
 
 class AlbumViewSet(viewsets.ModelViewSet):
     queryset = Album.objects.all()
