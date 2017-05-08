@@ -4,22 +4,23 @@ from django.contrib.postgres.fields import ArrayField
 
 class Notebook(models.Model):
     NotebookId = models.CharField(max_length=50, primary_key=True)
-    UserId = models.CharField(max_length=50)
-    ParentNotebookId = models.CharField(max_length=50)
-    Seq = models.IntegerField()
+    UserId = models.CharField(max_length=50, default="57cccf2aab644133ed0714c2")
+    ParentNotebookId = models.CharField(max_length=50, default="", blank=True)
+    Seq = models.IntegerField(default=-1)
     Title = models.CharField(max_length=20)
     UrlTitle = models.CharField(max_length=20)
     NumberNotes = models.IntegerField(default=0)
-    IsTrash = models.BooleanField()
-    IsBlog = models.BooleanField()
+    IsTrash = models.BooleanField(default=False)
+    IsBlog = models.BooleanField(default=False)
     CreatedTime = models.DateTimeField(auto_now_add=True)
     UpdatedTime = models.DateTimeField(auto_now_add=True)
-    IsWX = models.BooleanField()
-    Usn = models.IntegerField()
-    IsDeleted = models.BooleanField()
+    IsWX = models.BooleanField(default=False)
+    Usn = models.IntegerField(default=0)
+    IsDeleted = models.BooleanField(default=False)
     Subs = ArrayField(
         models.CharField(max_length=50, blank=True),
-        size = 30
+        size = 30,
+        default=[]
     )
 
 class Note(models.Model):

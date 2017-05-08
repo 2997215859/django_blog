@@ -12,6 +12,11 @@ class NoteSerializer(serializers.HyperlinkedModelSerializer):
         model = Note
         fields = ("NoteId","url","IsTrash","CommentNum","Title","Usn","Tags","AttachNum","ImgSrc","CreatedTime","IsBlog","LikeNum","IsRecommend","UpdatedUserId","HasSelfDefined","IsPublicShare","ReadNum","UserId","PublicTime","IsTop","UpdatedTime","IsDeleted","Desc","Src","RecommendTime","NotebookId","IsMarkdown","CreatedUserId","UrlTitle", "Content")
 
+class GetNoteContentSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Note
+        fields = ("Abstract", "Content", "CreatedTime", "IsBlog", "NoteId", "UpdatedTime", "UpdatedUserId", "UserId")
+
 class TagSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Tag

@@ -2883,7 +2883,7 @@ Notebook.curNotebookId = "", Notebook.cache = {}, Notebook.notebooks = [], Noteb
 	}, !0, !0)
 }, Notebook.doAddNotebook = function(o, e, t) {
 	var N = Notebook;
-	ajaxPost("/notebook/addNotebook", {
+	ajaxPost(/*/notebook/addNotebook*/"/api/notebook/add_notebook/", {
 		notebookId: o,
 		title: e,
 		parentNotebookId: t
@@ -2906,7 +2906,7 @@ Notebook.curNotebookId = "", Notebook.cache = {}, Notebook.notebooks = [], Noteb
 }, Notebook.deleteNotebook = function(o) {
 	var e = Notebook,
 		t = $(o).attr("notebookId");
-	t && ajaxGet("/notebook/deleteNotebook", {
+	t && ajaxGet(/*/notebook/deleteNotebook*/"/api/notebook/delete_notebook/", {
 		notebookId: t
 	}, function(o) {
 		o.Ok ? (e.tree.removeNode(e.tree.getNodeByTId(t)), e.tree2 && e.tree2.removeNode(e.tree2.getNodeByTId(t)), delete Notebook.cache[t], Notebook.changeNav()) : alert(o.Msg)

@@ -76,6 +76,13 @@ class NotebookViewSet(viewsets.ModelViewSet):
     serializer_class = NotebookSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
+    res = {"Ok": False,
+           "Code": 0,
+           "Id": "",
+           "Item": None,
+           "List": None,
+           "Msg": ""
+           }
     @list_route(methods=['post'])
     def update_notebook_title(self, request, *args, **kwargs):
         notebook_id = request.POST.get('notebookId')
@@ -88,6 +95,53 @@ class NotebookViewSet(viewsets.ModelViewSet):
         notebook.Title = title
         notebook.save()
         return Response(True, status=status.HTTP_200_OK)
+
+    @list_route(methods=['post'])
+    def add_notebook(self, request, *args, **kwargs):
+
+        data = {}
+        data["NotebookId"] = request.POST.get("notebookId")
+        data["Title"] = request.POST.get("title")
+        data["UrlTitle"] = request.POST.get("title")
+        data["ParentNotebookId"] = request.POST.get("parentNotebookId")
+        serializer = NotebookSerializer(data=data, context={'request': request})
+
+        if serializer.is_valid():
+            try:
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except Exception, e:
+                return Response(e, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @list_route(methods=['get'])
+    def delete_notebook(self, request, *args, **kwargs):
+
+        notebook_id = request.GET.get("notebookId")
+        try:
+            notebook = Notebook.objects.get(NotebookId=notebook_id)
+        except Notebook.DoesNotExist:
+            self.res["Ok"] = False
+            return Response(self.res, status=status.HTTP_404_NOT_FOUND)
+        notebook.delete()
+        try:
+            notebook.save()
+        except Exception, e:
+            self.res["Ok"] = False
+            return Response(self.res, status=status.HTTP_400_BAD_REQUEST)
+
+        notes = Note.objects.filter(NotebookId=notebook_id)
+        notes.delete()
+        try:
+            notes.save()
+            self.res["Ok"] = True
+            return Response(self.res, status=status.HTTP_200_OK)
+        except Exception, e:
+            self.res["Ok"] = False
+            return Response(self.res, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class NoteViewSet(viewsets.ModelViewSet):
     queryset = Note.objects.all()
@@ -135,11 +189,22 @@ class NoteViewSet(viewsets.ModelViewSet):
     @list_route(methods=['post'])
     def trash_note(self, request):
         note_ids = request.POST.getlist('noteIds[]', [])
+
+
         for note_id in note_ids:
             try:
                 note = Note.objects.get(NoteId = note_id)
             except Note.DoesNotExist:
                 return Response({"status": "query info is not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            try:
+                notebook = Notebook.objects.get(NotebookId=note.NotebookId)
+            except Notebook.DoesNotExist:
+                self.res["Ok"] = False
+                return Response(self.res, status=status.HTTP_404_NOT_FOUND)
+            notebook.NumberNotes = notebook.NumberNotes - 1
+            notebook.save()
+
             note.IsTrash = True
             note.save()
         return Response(True)
@@ -150,6 +215,16 @@ class NoteViewSet(viewsets.ModelViewSet):
         is_new = request.POST.get('IsNew')
         if is_new == "true":
             serializer = NoteSerializer(data=request.data,context={'request': request})
+
+            try:
+                notebook = Notebook.objects.get(NotebookId=request.POST.get("NotebookId"))
+            except Notebook.DoesNotExist:
+                self.res["Ok"] = False
+                return Response(self.res, status=status.HTTP_404_NOT_FOUND)
+
+            notebook.NumberNotes = notebook.NumberNotes + 1
+            notebook.save()
+
         else:
             note_id = request.POST.get('NoteId')
             note = Note.objects.get(NoteId=note_id)
@@ -174,7 +249,7 @@ class NoteViewSet(viewsets.ModelViewSet):
             print zh_tags
             serializer.save(Tags=zh_tags)
             self.res["Ok"] = True
-            # self.res["Item"] = serializer.data
+            self.res["Item"] = serializer.data
             return Response(self.res, status=status.HTTP_200_OK)
         else:
             self.res["Ok"] = False
