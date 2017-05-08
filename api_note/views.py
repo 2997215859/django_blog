@@ -124,24 +124,16 @@ class NotebookViewSet(viewsets.ModelViewSet):
         except Notebook.DoesNotExist:
             self.res["Ok"] = False
             return Response(self.res, status=status.HTTP_404_NOT_FOUND)
-        notebook.delete()
-        try:
-            notebook.save()
-        except Exception, e:
-            self.res["Ok"] = False
-            return Response(self.res, status=status.HTTP_400_BAD_REQUEST)
 
-        notes = Note.objects.filter(NotebookId=notebook_id)
-        notes.delete()
+
         try:
-            notes.save()
+            notebook.IsDeleted = True
+            notebook.delete()
             self.res["Ok"] = True
             return Response(self.res, status=status.HTTP_200_OK)
         except Exception, e:
             self.res["Ok"] = False
             return Response(self.res, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 class NoteViewSet(viewsets.ModelViewSet):
     queryset = Note.objects.all()
