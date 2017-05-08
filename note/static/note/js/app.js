@@ -325,7 +325,7 @@ function setCookie(t, e, n) {
 	o.setDate(o.getDate() + n), document.cookie = t + "=" + escape(e) + (null == n ? "" : ";expires=" + o.toGMTString()) + ";domain=leanote.com;path=/", document.cookie = t + "=" + escape(e) + (null == n ? "" : ";expires=" + o.toGMTString()) + ";domain=leanote.com;path=/note", document.cookie = t + "=" + escape(e) + (null == n ? "" : ";expires=" + o.toGMTString())
 }
 function logout() {
-	Note.curChangedSaveIt(!0), LEA.isLogout = !0, setCookie("LEANOTE_SESSION", "", -1),location.href = "/api-auth/login/" /*location.href = "/logout?id=1"*/
+	Note.curChangedSaveIt(!0), LEA.isLogout = !0, setCookie("LEANOTE_SESSION", "", -1),location.href = "/api-auth/login/?next=/note/index" /*location.href = "/logout?id=1"*/
 }
 function getImageSize(t, e) {
 	function n(t, n) {
