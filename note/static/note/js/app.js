@@ -785,7 +785,7 @@ Note.curNoteId = "", Note.interval = "", Note.itemIsBlog = '<div class="item-blo
 		return n && n.hasChanged ? (log("需要保存..."), Note.renderChangedNote(n), delete n.hasChanged, showMsg(getMsg("saving")), a.saveInProcess[n.NoteId] = !0,
 			ajaxPost("/api/note/update_note_or_content/", n, function(t) {
 			console.log("弹出前", t)
-			a.saveInProcess[n.NoteId] = !1, "object" == typeof t && /*t.Ok*/ true ? (n.IsNew && (t.Item.IsNew = !1, Note.setNoteCache(t.Item, !1), Pjax.changeNote(t.Item)), showMsg(getMsg("saveSuccess"), 1e3)) : alert(getMsg("saveError")), e && e()
+			a.saveInProcess[n.NoteId] = !1, "object" == typeof t && /*t.Ok*/ t.Ok ? (n.IsNew && (t.Item.IsNew = !1, Note.setNoteCache(t.Item, !1), Pjax.changeNote(t.Item)), showMsg(getMsg("saveSuccess"), 1e3)) : alert(getMsg("saveError")), e && e()
 		}), void 0 != n.Tags && "string" == typeof n.Tags && (n.Tags = n.Tags.split(",")), Note.setNoteCache(n, !1), Note.setNoteCache({
 			NoteId: n.NoteId,
 			UpdatedTime: (new Date).format("yyyy-MM-ddThh:mm:ss.S")

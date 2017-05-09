@@ -19,6 +19,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 import json, os
 import hashlib
 import time
+from django.utils.http import urlquote
 
 def get_md5_value(src):
     m = hashlib.md5()
@@ -239,7 +240,10 @@ class NoteViewSet(viewsets.ModelViewSet):
                 else:
                     zh_tags.append(en_tag)
             print zh_tags
-            serializer.save(Tags=zh_tags)
+            if is_new == "true":
+                serializer.save(Tags=zh_tags, UrlTitle=urlquote(request.POST.get("title")))
+            else:
+                serializer.save(Tags=zh_tags)
             self.res["Ok"] = True
             self.res["Item"] = serializer.data
             return Response(self.res, status=status.HTTP_200_OK)
@@ -300,12 +304,17 @@ class NoteViewSet(viewsets.ModelViewSet):
             is_blog = False
         else:
             return Response(False, status=status.HTTP_400_BAD_REQUEST)
+
         for note_id in note_ids:
             try:
                 note = Note.objects.get(NoteId=note_id)
             except Note.DoesNotExist:
                 return Response(False, status=status.HTTP_404_NOT_FOUND)
             note.IsBlog = is_blog
+            # if note.UrlTitle == "":
+            #     print "url title is null null null null null null"
+            #     note.UrlTitle = urlquote(note.Title)
+            #     print note.UrlTitle
             note.save()
         return Response(True, status=status.HTTP_200_OK)
 

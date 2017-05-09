@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="keywords" content="leanote,leanote.com">
+<meta name="description" content="leanote, not only a notebook">
+<meta name="author" content="leanote">
+
+<title>
+{% if header.curIsIndex %}
+    {% header.blogInfo.Title %}
+{% else if header.curIsCate %}
+    分类-{% header.curCateTitle %}
+{% else if header.curIsSearch %}
+    搜索-{% header.keywords %}
+{% else if header.curIsTags %}
+    我的标签
+{% else if header.curIsTagPosts %}
+    标签-{% header.curTag %}
+{% else if header.curIsPost %}
+	{% header.post.Title %}
+{% else if header.curIsSingle %}
+	{% header.single.Title %}
+{% else if header.curIsArchive %}
+	归档
+{% endif %}
+
+</title>
+<!-- Bootstrap core CSS -->
+{% load staticfiles %}
+<link href="{% static "css/bootstrap.css" %}" rel="stylesheet">
+<!-- 字体必须同一域 -->
+<link href="{% static "css/font-awesome.css" %}" rel="stylesheet">
+<link href="{% static "blog/css/style.css" %}/style.css" rel="stylesheet">
+<script>
+function log(o) {
+}
+</script>
+<style>
+
+</style>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?63adf4c3e1d84ebedd2d9f1e483904eb";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+<body>
+
+{% if header.curIsPost or header.curIsSingle %}
+<div class="clearfix">
+{% endif if %}
+<div id="headerAndNav" >
+	<div id="headerContainer" class="container">
+		<!-- 头部可放博客名, 导航 -->
+		<div id="header">
+
+			{{ userInfo.Username }}
+			<h1>
+				<a href="{{ hf.indexUrl }}" id="logo">
+    				{% if hf.blogInfo.Logo %}
+    				<div class="blog-logo">
+    				    <img src="{{ hf.blogInfo.Logo }}" title="{{ hf.blogInfo.Title }}"/>
+    				</div>
+    				{% endif %}
+    				<div>
+    				    {% hf.blogInfo.Title | raw %}
+    				</div>
+				</a>
+			</h1>
+			<div id="blogDesc">
+				{% hf.blogInfo.SubTitle | raw %}
+			</div>
+		</div>
+	</div>
+
+	<!-- Static navbar -->
+	<div class="navbar navbar-default">
+	  <div class="container">
+	    <div class="navbar-header">
+	      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	      <a class="navbar-brand" href="{{ indexUrl }}">
+	      	{% if hf.blogInfo.Logo %}
+			    <img src="{{ hf.blogInfo.Logo }}" title="{{ hf.blogInfo.Title }}"/>
+			{% endif if %}
+			{% hf.blogInfo.Title | raw %}
+	      </a>
+	    </div>
+	    <div class="navbar-collapse collapse">
+	      <ul class="nav navbar-nav">
+
+	    	<li class="{% if hf.curIsIndex %}active{% endif %}"><a href="{{ indexUrl }}">主页</a></li>
+		    <!-- 分类页 -->
+		   	{% for cate in hf.cates %}
+				<li class="{% ifequal cate.CateId hf.curCateId %}active{% endifequal %}">
+					<a href="{% hf.cateUrl %}/{% single.UrlTitle %}"
+					>{% single.Title %} </a>
+				</li>
+			{% endfor  %}
+
+			<!-- 单页 -->
+			{% for single in hf.singles %}
+			    <li class="{% ifequal hf.curSingleId single.SingleId %}active{% endifequal %}">
+					<a href="{%  hf.singleUrl %}/{% single.UrlTitle %}">{% single.Title %}</a>
+				</li>
+			{% endfor %}
+
+			<!-- 归档 -->
+			<li class="{% if hf.curIsArchive %} active{% endif  %} ">
+				<a href="{% hf.archiveUrl %} ">归档</a>
+			</li>
+			<li class="{% if hf.curIsTags %} active{% endif  %} ">
+				<a href="{% hf.tagsUrl %} ">标签</a>
+			</li>
+
+	      </ul>
+	      <form class="navbar-form navbar-right" id="search" onsubmit="search(event);return false;">
+	      	<div class="input-group">
+			  	<span class="input-group-addon" id="searchIcon" onclick="search(event);"><i class="fa fa-search"></i></span>
+		        <input type="text" placeholder="search" id="searchInput" class="form-control" value="{{ keywords }}">
+		  	</div>
+	      </form>
+	    </div><!--/.nav-collapse -->
+	  </div>
+	</div>
+</div>
